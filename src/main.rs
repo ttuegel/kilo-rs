@@ -15,5 +15,9 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+use std::io::Read;
+
 fn main() {
+    let mut c : [u8; 1] = [0; 1];
+    while std::io::stdin().read_exact(&mut c).is_ok() {};
 }
