@@ -19,5 +19,9 @@ use std::io::Read;
 
 fn main() {
     let mut c : [u8; 1] = [0; 1];
-    while std::io::stdin().read_exact(&mut c).is_ok() {};
+    while std::io::stdin().read_exact(&mut c).is_ok() {
+        if char::from(c[0]) == 'q' {
+            break;
+        }
+    };
 }
