@@ -16,12 +16,23 @@
 */
 
 use std::io::Read;
+use std::os::unix::io::AsRawFd;
+use termios::Termios;
 
 fn main() {
+    enable_raw_mode(std::io::stdin());
+
     let mut c : [u8; 1] = [0; 1];
     while std::io::stdin().read_exact(&mut c).is_ok() {
         if char::from(c[0]) == 'q' {
             break;
         }
     };
+}
+
+fn enable_raw_mode<T: AsRawFd>(t : T) {
+    let fd = t.as_raw_fd();
+    let mut termios = Termios::from_fd(fd).unwrap();
+    termios.c_lflag &= !termios::ECHO;
+    termios::tcsetattr(fd, termios::TCSAFLUSH, &termios).unwrap();
 }
