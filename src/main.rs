@@ -41,6 +41,8 @@ fn enable_raw_mode<T: AsRawFd>(t : T) -> RestoreTermios {
     let orig_termios = termios;
     /* Disable software control flow: Ctrl-S and Ctrl-Q */
     termios.c_iflag &= !termios::IXON;
+    /* Disable CR translation: Ctrl-M */
+    termios.c_iflag &= !termios::ICRNL;
     /* Disable terminal echo */
     termios.c_lflag &= !termios::ECHO;
     /* Disable canonical mode */
