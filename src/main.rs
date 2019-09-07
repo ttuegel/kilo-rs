@@ -28,9 +28,9 @@ fn main() {
         if char == 'q' {
             break;
         } else if char.is_control() {
-            println!("0x{:02x}", c[0]);
+            print!("0x{:02x}\r\n", c[0]);
         } else {
-            println!("0x{:02x} ({1})", c[0], char);
+            print!("0x{:02x} ({1})\r\n", c[0], char);
         }
     };
 }
