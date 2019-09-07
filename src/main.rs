@@ -16,11 +16,11 @@
 */
 
 use std::io::Read;
-use std::os::unix::io::AsRawFd;
+use std::os::unix::io::{AsRawFd, RawFd};
 use termios::Termios;
 
 fn main() {
-    enable_raw_mode(std::io::stdin());
+    let _restore_termios = enable_raw_mode(std::io::stdin());
 
     let mut c : [u8; 1] = [0; 1];
     while std::io::stdin().read_exact(&mut c).is_ok() {
@@ -30,9 +30,28 @@ fn main() {
     };
 }
 
-fn enable_raw_mode<T: AsRawFd>(t : T) {
-    let fd = t.as_raw_fd();
-    let mut termios = Termios::from_fd(fd).unwrap();
+fn enable_raw_mode<T: AsRawFd>(t : T) -> RestoreTermios {
+    let raw_fd = t.as_raw_fd();
+    let mut termios = Termios::from_fd(raw_fd).unwrap();
+    let orig_termios = termios;
     termios.c_lflag &= !termios::ECHO;
-    termios::tcsetattr(fd, termios::TCSAFLUSH, &termios).unwrap();
+    termios::tcsetattr(raw_fd, termios::TCSAFLUSH, &termios).unwrap();
+    RestoreTermios { orig_termios, raw_fd }
+}
+
+/*
+    RestoreTermios captures the original Termios and RawFd before setting the
+    terminal to raw mode; when RestoreTermios is drop()-ed, the original
+    terminal attributes are restored.
+ */
+struct RestoreTermios {
+    orig_termios: Termios,
+    raw_fd: RawFd,
+}
+
+impl Drop for RestoreTermios {
+    fn drop(&mut self) {
+        termios::tcsetattr(self.raw_fd, termios::TCSAFLUSH, &self.orig_termios)
+            .unwrap();
+    }
 }

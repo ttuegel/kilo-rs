@@ -35,3 +35,11 @@ so a conversion using `char::from()` is necessary.
 Rather than depend on the C library, we use an external crate for `Termios`.
 We use `as_raw_fd()` to get the file descriptor corresponding to the `io::stdin()` stream.
 
+### atexit
+
+Instead of using the C library's `atexit()` to register an exit handler,
+we will use Rust's `Drop` trait to ensure that the terminal attributes are restored.
+(Actually, the Rust runtime seems to do this for us,
+but it is a good exercise anyway.)
+This only seems to work if the program exits normally or panics;
+the default signal handlers bypass this mechanism.
