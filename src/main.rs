@@ -24,8 +24,13 @@ fn main() {
 
     let mut c : [u8; 1] = [0; 1];
     while std::io::stdin().read_exact(&mut c).is_ok() {
-        if char::from(c[0]) == 'q' {
+        let char = char::from(c[0]);
+        if char == 'q' {
             break;
+        } else if char.is_control() {
+            println!("0x{:02x}", c[0]);
+        } else {
+            println!("0x{:02x} ({1})", c[0], char);
         }
     };
 }

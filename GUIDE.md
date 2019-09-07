@@ -43,3 +43,9 @@ we will use Rust's `Drop` trait to ensure that the terminal attributes are resto
 but it is a good exercise anyway.)
 This only seems to work if the program exits normally or panics;
 the default signal handlers bypass this mechanism.
+
+### keypresses
+
+The significant difference between the Rust and C version
+is that `println!()` and `printf()` expect different format strings;
+actually, that's not so significant.
