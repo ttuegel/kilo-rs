@@ -39,8 +39,16 @@ fn enable_raw_mode<T: AsRawFd>(t : T) -> RestoreTermios {
     let raw_fd = t.as_raw_fd();
     let mut termios = Termios::from_fd(raw_fd).unwrap();
     let orig_termios = termios;
-    termios.c_iflag &= !(termios::IXON);
-    termios.c_lflag &= !(termios::ECHO | termios::ICANON | termios::ISIG);
+    /* Disable software control flow: Ctrl-S and Ctrl-Q */
+    termios.c_iflag &= !termios::IXON;
+    /* Disable terminal echo */
+    termios.c_lflag &= !termios::ECHO;
+    /* Disable canonical mode */
+    termios.c_lflag &= !termios::ICANON;
+    /* Disable signals: Ctrl-C and Ctrl-Z */
+    termios.c_lflag &= !termios::ISIG;
+    /* Disable literal input: Ctrl-V */
+    termios.c_lflag &= !termios::IEXTEN;
     termios::tcsetattr(raw_fd, termios::TCSAFLUSH, &termios).unwrap();
     RestoreTermios { orig_termios, raw_fd }
 }
