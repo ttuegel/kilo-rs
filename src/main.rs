@@ -51,6 +51,8 @@ fn enable_raw_mode<T: AsRawFd>(t : T) -> RestoreTermios {
     termios.c_lflag &= !termios::ISIG;
     /* Disable literal input: Ctrl-V */
     termios.c_lflag &= !termios::IEXTEN;
+    /* Disable output processing, particularly newline translation */
+    termios.c_oflag &= !termios::OPOST;
     termios::tcsetattr(raw_fd, termios::TCSAFLUSH, &termios).unwrap();
     RestoreTermios { orig_termios, raw_fd }
 }
