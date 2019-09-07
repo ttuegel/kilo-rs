@@ -39,6 +39,7 @@ fn enable_raw_mode<T: AsRawFd>(t : T) -> RestoreTermios {
     let raw_fd = t.as_raw_fd();
     let mut termios = Termios::from_fd(raw_fd).unwrap();
     let orig_termios = termios;
+    termios.c_iflag &= !(termios::IXON);
     termios.c_lflag &= !(termios::ECHO | termios::ICANON | termios::ISIG);
     termios::tcsetattr(raw_fd, termios::TCSAFLUSH, &termios).unwrap();
     RestoreTermios { orig_termios, raw_fd }
