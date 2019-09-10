@@ -49,10 +49,17 @@ fn enable_raw_mode<T: AsRawFd>(t : T) -> RestoreTermios {
     termios.c_lflag &= !termios::ICANON;
     /* Disable signals: Ctrl-C and Ctrl-Z */
     termios.c_lflag &= !termios::ISIG;
-    /* Disable literal input: Ctrl-V */
+    /* Disable verbatim input: Ctrl-V */
     termios.c_lflag &= !termios::IEXTEN;
     /* Disable output processing, particularly newline translation */
     termios.c_oflag &= !termios::OPOST;
+    /* Do not send SIGINT for break conditions */
+    termios.c_iflag &= !termios::BRKINT;
+    /* Disable input parity checking */
+    termios.c_iflag &= !termios::INPCK;
+    /* Set the character size to 8-bit bytes */
+    termios.c_iflag &= !termios::ISTRIP;
+    termios.c_cflag |= termios::CS8;
     termios::tcsetattr(raw_fd, termios::TCSAFLUSH, &termios).unwrap();
     RestoreTermios { orig_termios, raw_fd }
 }
